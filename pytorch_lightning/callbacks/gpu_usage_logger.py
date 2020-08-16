@@ -13,37 +13,38 @@ import subprocess
 import time
 
 from pytorch_lightning.callbacks.base import Callback
+from pytorch_lightning.utilities.exceptions import MisconfigurationException
 
 
 class GpuUsageLogger(Callback):
     r"""
-        Automatically logs GPU memory and GPU usage during training stage.
+    Automatically logs GPU memory and GPU usage during training stage.
 
-        Args:
-            memory_utilisation: Set to ``True`` to log used, free and percentage of memory
-                utilisation at starts and ends of each step. Default: ``True``.
-                From nvidia-smi --help-query-gpu
-                memory.used = ```Total memory allocated by active contexts.```
-                memory.free = ```Total free memory.```
-            gpu_utilisation: Set to ``True`` to log percentage of GPU utilisation.
-                at starts and ends of each step. Default: ``True``.
-            intra_step_time: Set to ``True`` to log the time of each step. Default: ``False``
-            inter_step_time: Set to ``True`` to log the time between the end of one step
-                and the start of the next. Default: ``False``
-            fan_speed: Set to ``True`` to log percentage of fan speed. Default: ``False``.
-            temperature: Set to ``True`` to log the memory and gpu temperature in degrees C.
-                Default: ``False``
+    Args:
+        memory_utilisation: Set to ``True`` to log used, free and percentage of memory
+            utilisation at starts and ends of each step. Default: ``True``.
+            From nvidia-smi --help-query-gpu
+            memory.used = ```Total memory allocated by active contexts.```
+            memory.free = ```Total free memory.```
+        gpu_utilisation: Set to ``True`` to log percentage of GPU utilisation.
+            at starts and ends of each step. Default: ``True``.
+        intra_step_time: Set to ``True`` to log the time of each step. Default: ``False``
+        inter_step_time: Set to ``True`` to log the time between the end of one step
+            and the start of the next. Default: ``False``
+        fan_speed: Set to ``True`` to log percentage of fan speed. Default: ``False``.
+        temperature: Set to ``True`` to log the memory and gpu temperature in degrees C.
+            Default: ``False``
 
-        Example::
+    Example::
 
-            >>> from pytorch_lightning import Trainer
-            >>> from pytorch_lightning.callbacks import GpuUsageLogger
-            >>> gpu_usage = GpuUsageLogger()
-            >>> trainer = Trainer(callbacks=[gpu_usage])
+        >>> from pytorch_lightning import Trainer
+        >>> from pytorch_lightning.callbacks import GpuUsageLogger
+        >>> gpu_usage = GpuUsageLogger()
+        >>> trainer = Trainer(callbacks=[gpu_usage])
 
-        Gpu usage is mainly based on nvidia-smi --query-gpu command.
-        The description of the queries used here as appears in
-        in ``nvidia-smi --help-query-gpu``:
+    Gpu usage is mainly based on nvidia-smi --query-gpu command.
+    The description of the queries used here as appears in
+    in ``nvidia-smi --help-query-gpu``:
 
         "fan.speed"
         ```The fan speed value is the percent of maximum speed that the device's fan is currently
