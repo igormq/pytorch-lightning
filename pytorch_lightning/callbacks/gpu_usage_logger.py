@@ -7,10 +7,12 @@ Log GPU memory and GPU usage during training
 
 """
 
-from pytorch_lightning.callbacks.base import Callback
-import subprocess
 import os
+import shutil
+import subprocess
 import time
+
+from pytorch_lightning.callbacks.base import Callback
 
 
 class GpuUsageLogger(Callback):
@@ -31,6 +33,7 @@ class GpuUsageLogger(Callback):
             fan_speed: Set to ``True`` to log percentage of fan speed. Default: ``False``.
             temperature: Set to ``True`` to log the memory and gpu temperature in degrees C.
                 Default: ``False``
+
         Example::
 
             >>> from pytorch_lightning import Trainer
@@ -64,12 +67,18 @@ class GpuUsageLogger(Callback):
         "temperature.memory"
         ```HBM memory temperature. in degrees C.```
 
-        """
+    """
 
     def __init__(self, memory_utilisation: bool = True, gpu_utilisation: bool = True,
                  intra_step_time: bool = False, inter_step_time: bool = False,
                  fan_speed: bool = False, temperature: bool = False):
-        super(GpuUsageLogger).__init__()
+        super().__init__()
+
+        if shutil.which('nvidia-smi') is None:
+            raise MisconfigurationException(
+                'Cannot use GpuUsageLogger callback because nvidia driver is not installed.'
+            )
+
         self.memory_utilisation = memory_utilisation
         self.gpu_utilisation = gpu_utilisation
         self.intra_step_time = intra_step_time
@@ -80,6 +89,9 @@ class GpuUsageLogger(Callback):
         self.snap_inter_step_time = None
 
     def on_batch_start(self, trainer, pl_module):
+        if trainer.logger is None:
+            return
+
         if self.gpu_utilisation:
             self._log_gpu(trainer)
         if self.memory_utilisation:
@@ -88,13 +100,18 @@ class GpuUsageLogger(Callback):
         if self.inter_step_time:
             # First log at beginning of second step
             if self.snap_inter_step_time:
-                trainer.logger.log_metrics({'Batch_Time/inter_step (ms)':
-                                                (time.time() - self.snap_inter_step_time) * 1000},
-                                           step=trainer.global_step)
+                trainer.logger.log_metrics(
+                    {'Batch_Time/inter_step (ms)': (time.time() - self.snap_inter_step_time) * 1000},
+                    step=trainer.global_step
+                )
+
         if self.intra_step_time:
             self.snap_intra_step_time = time.time()
 
     def on_batch_end(self, trainer, pl_module):
+        if trainer.logger is None:
+            return
+
         if self.gpu_utilisation:
             self._log_gpu(trainer)
         if self.memory_utilisation:
@@ -111,9 +128,10 @@ class GpuUsageLogger(Callback):
 
         if self.intra_step_time:
             if self.snap_intra_step_time:
-                trainer.logger.log_metrics({'Batch_Time/intra_step (ms)':
-                                                (time.time() - self.snap_intra_step_time) * 1000},
-                                           step=trainer.global_step)
+                trainer.logger.log_metrics(
+                    {'Batch_Time/intra_step (ms)': (time.time() - self.snap_intra_step_time) * 1000},
+                    step=trainer.global_step
+                )
 
     def on_train_epoch_start(self, trainer, pl_module):
         self.snap_intra_step_time = None
@@ -121,10 +139,13 @@ class GpuUsageLogger(Callback):
 
     @staticmethod
     def _get_gpu_stat(pitem: str, unit: str):
-        result = subprocess.run(["/bin/nvidia-smi", f"--query-gpu={pitem}", "--format=csv,nounits,noheader"],
-                                encoding="utf-8", stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE,  # for backward compatibility with python version 3.6
-                                check=True)
+        result = subprocess.run(
+            [shutil.which('nvidia-smi'), f"--query-gpu={pitem}", "--format=csv,nounits,noheader"],
+            encoding="utf-8", stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,  # for backward compatibility with python version 3.6
+            check=True
+        )
+
         try:
             gpu_usage = [float(x) for x in result.stdout.strip().split(os.linesep)]
         except ValueError:
