@@ -146,6 +146,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 - Fixed an issue that caused `Trainer.test()` to stall in ddp mode ([#2997](https://github.com/PyTorchLightning/pytorch-lightning/pull/2997))
 
+- Fixed GpuUsageLogger to work on different platforms ([#3008](https://github.com/PyTorchLightning/pytorch-lightning/pull/3008))
+
 ## [0.8.5] - 2020-07-09
 
 ### Added
