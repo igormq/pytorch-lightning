@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 
-## [unreleased] - YYYY-MM-DD
+## [0.9.0] - YYYY-MM-DD
 
 ### Added
 
@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
   * tests for val loop flow ([#2605](https://github.com/PyTorchLightning/pytorch-lightning/pull/2605))
   * `EvalResult` support for train and val. loop ([#2615](https://github.com/PyTorchLightning/pytorch-lightning/pull/2615), [#2651](https://github.com/PyTorchLightning/pytorch-lightning/pull/2651))
   * weighted average in results obj ([#2930](https://github.com/PyTorchLightning/pytorch-lightning/pull/2930))
+  * fix result obj DP auto reduce ([#3013](https://github.com/PyTorchLightning/pytorch-lightning/pull/3013))
 
 - Added class `LightningDataModule` ([#2668](https://github.com/PyTorchLightning/pytorch-lightning/pull/2668))
 
@@ -51,6 +52,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Added `strict=False` for `load_from_checkpoint` ([#2819](https://github.com/PyTorchLightning/pytorch-lightning/pull/2819))
 
 - Added saving test predictions on multiple GPUs ([#2926](https://github.com/PyTorchLightning/pytorch-lightning/pull/2926))
+
+- Added warning when changing monitor and using results obj ([#3014](https://github.com/PyTorchLightning/pytorch-lightning/pull/3014))
 
 ### Changed
 
