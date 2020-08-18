@@ -735,9 +735,10 @@ class Trainer(
 
         """
         parser = ArgumentParser(parents=[parent_parser], add_help=False,)
-
+        added_args = [x.dest for x in parser._actions]
+        
         blacklist = ['kwargs']
-        depr_arg_names = cls.get_deprecated_arg_names() + blacklist
+        depr_arg_names = cls.get_deprecated_arg_names() + blacklist + added_args
 
         allowed_types = (str, int, float, bool)
 
